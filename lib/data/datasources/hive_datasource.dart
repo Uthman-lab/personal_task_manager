@@ -33,22 +33,35 @@ class HiveDataSourceImpl implements HiveDataSource {
 
   @override
   Future<void> updateTask(Task task) async {
-    final index = _box.values.toList().indexWhere(
-      (t) => t["title"] == task.title,
-    );
-    if (index != -1) {
-      await _box.putAt(index, task.toMap());
+    // Find the key for the task with the matching ID
+    dynamic keyToUpdate;
+    for (var key in _box.keys) {
+      final value = _box.get(key);
+      if (value != null && value["id"] == task.id) {
+        keyToUpdate = key;
+        break;
+      }
+    }
+    
+    if (keyToUpdate != null) {
+      await _box.put(keyToUpdate, task.toMap());
     }
   }
 
   @override
   Future<void> deleteTask(String taskId) async {
-    // Implementation for delete functionality
-    final index = _box.values.toList().indexWhere(
-      (t) => t["title"] == taskId, // Using title as ID for now
-    );
-    if (index != -1) {
-      await _box.deleteAt(index);
+    // Find the key for the task with the matching ID
+    dynamic keyToDelete;
+    for (var key in _box.keys) {
+      final value = _box.get(key);
+      if (value != null && value["id"] == taskId) {
+        keyToDelete = key;
+        break;
+      }
+    }
+    
+    if (keyToDelete != null) {
+      await _box.delete(keyToDelete);
     }
   }
 }
